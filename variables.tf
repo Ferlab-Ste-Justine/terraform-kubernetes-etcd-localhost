@@ -9,3 +9,9 @@ variable "etcd_nodeport" {
   type = number
   default = 32379
 }
+
+variable "skip_tls" {
+  description = "Whether to skip tls"
+  type = bool
+  default = false
+}

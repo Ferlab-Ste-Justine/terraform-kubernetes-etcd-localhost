@@ -17,3 +17,7 @@ output "root_certificate" {
 output "root_key" {
   value = module.root_certificate.key
 }
+
+output "root_password" {
+  value = random_password.root_password.result
+}

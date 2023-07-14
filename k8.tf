@@ -1,11 +1,26 @@
+locals {
+    protocol = !var.skip_tls ? "https" : "http"
+}
+
 resource "kubernetes_config_map" "etcd_scripts" {
   metadata {
     name = "${var.kubernetes_resources_prefix}etcd-scripts"
   }
 
   data = {
-    "entrypoint.sh" = "${file("${path.module}/run-etcd.sh")}"
-    "bootstrap-auth.sh" = "${file("${path.module}/bootstrap-etcd-auth.sh")}"
+    "entrypoint.sh" = templatefile(
+      "${path.module}/run-etcd.sh",
+      {
+        protocol = local.protocol,
+        skip_tls = var.skip_tls
+      }
+    )
+    "bootstrap-auth.sh" = !var.skip_tls ? file("${path.module}/bootstrap-etcd-auth-tls.sh") : templatefile(
+      "${path.module}/bootstrap-etcd-auth-no-tls.sh",
+      {
+        root_password = random_password.root_password.result
+      }
+    )
   }
 }
 
